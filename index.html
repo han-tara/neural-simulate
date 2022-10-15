@@ -1,0 +1,97 @@
+<style>
+    body{margin: 0%;}
+    canvas{border: 1px solid black;}
+    textarea{display: block; width: 100%; resize: vertical;}
+</style>
+
+<div style="float: left;">
+    <canvas id="draw"></canvas>
+    <br>
+    <button id="clear">clear canvas</button>
+    <button id="test">test</button>
+    <button id="isCircle">this is circle</button>
+    <button id="isRect">this is rectangle</button>
+    <p style="color: red; font-size: small;">click false button if result wrong</p>
+    <p id="hasil">Result: none</p>
+</div>
+<div style="float: right;">
+    <p id="ni">Number of interation:</p>
+    <p>Weight:</p>
+    <textarea id="weightValue"></textarea>
+    <button id="load">load weight</button>
+    <p>Weight viewer:</p>
+    <canvas id="weightView"></canvas>
+</div>
+
+<script src="JS/jquery-min.js"></script>
+<script> //untuk canvas
+    //inisiasi
+    const canvas = $('#draw')
+    const size = 450
+    canvas[0].width = size
+    canvas[0].height = size
+    const ctx = canvas[0].getContext('2d')
+    ctx.scale(30,30)
+
+    //posisi pixel
+    let pixel = []
+
+    //gambar pixel
+    let gambar = false
+    canvas.mousedown(el=>{
+        gambar = true
+        newCordinate(el)
+    })
+    .mouseup(el=>{
+        gambar = false
+    })
+    .mouseleave(el=>{
+        gambar = false
+    })
+    .mousemove(el=>{
+        if (gambar == true) { //hanya berlaku apabila hold mouse button
+            newCordinate(el)
+        }
+    })
+    //reset pixel
+    $('#clear').click(el=>{
+        pixel = []
+    })
+
+    //create new cordinate
+    function newCordinate (el) {
+        //get cordinate
+        let posX = Math.floor((el.clientX * 15)/size)
+        let posY = Math.floor((el.clientY * 15)/size)
+        let newCord = posX+'*'+posY
+        //save pixel cordinate
+        if (posX < 15 && posX >= 0 && posY < 15 && posY >= 0 && pixel.includes(newCord) == false) { //only if within canvas
+            pixel.push(newCord)
+            console.log(pixel.length)
+        }
+    }
+</script>
+<script src="JS/crudeML.js"></script>
+<script> //update frame
+    function onUpdate () {
+        requestAnimationFrame(onUpdate)
+        //canvas1
+        ctx.clearRect(0,0,size,size)
+        pixel.forEach(el=>{
+            el = el.split('*')
+            ctx.fillStyle = 'black'
+            ctx.fillRect(parseInt(el[0]),parseInt(el[1]),1,1)
+        })
+        //canvas2
+        wCtx.fillStyle = colorGradient(0)
+        wCtx.fillRect(0,0,size,size)
+        lineWeight.forEach((el,id)=>{
+            if (id > 0) { //make sure index 0 (total iteration) is not use
+                el = el.split('*') //array ex [3,2,-3]
+                wCtx.fillStyle = colorGradient(parseInt(el[2]))
+                wCtx.fillRect(parseInt(el[0]),parseInt(el[1]),1,1)
+            }
+        })
+    }
+    onUpdate()
+</script>
